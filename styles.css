@@ -1,0 +1,144 @@
+:root {
+    --emptyTileColor: #e1cbc5;
+    --tileBorderColor: #dbc2ba;
+    --dominoTextColor: #444444;
+    --emptyDominoColor: #f5efee;
+    --nonexistingTileColor: white;
+    --selectedTileColor: #d63852;
+    --addConstraintColor: #4aa1e9;
+    --tileLength: 50px;
+
+    --constraintTileColor1: #eba2af;
+    --constraintTileColor2: #adc0c1;
+    --constraintTileColor3: #a5a2ae;
+    --constraintTileColor4: #b8b191;
+    --constraintTileColor5: #eabd97;
+    --constraintTileColor6: #c4a3c0;
+
+    --constraintMarkerColor1: #db127a;
+    --constraintMarkerColor2: #008393;
+    --constraintMarkerColor3: #124076;
+    --constraintMarkerColor4: #547602;
+    --constraintMarkerColor5: #d15609;
+    --constraintMarkerColor6: #9351cb;
+}
+body{
+    background-color: white;
+    justify-items: center;
+    justify-content: center;
+    display: grid;
+}
+#solvePuzzleButton{
+    background-color: #d63852;
+}
+#dominosContainer{
+    display: flex;
+    flex-wrap: wrap;
+}
+#addConstraintContainer{
+    text-align: center;
+    padding: 5px;
+    border: 3px solid var(--dominoTextColor);
+}
+#toggleAddConstraint{
+    border: 2px solid var(--addConstraintColor);
+}
+.boardRow{
+    display: flex;
+}
+.tile{
+    width: var(--tileLength);
+    height: var(--tileLength);;
+    border: 3px solid var(--tileBorderColor);
+    position: relative;
+}
+.toggleAddConstraintActive{
+    background-color: var(--addConstraintColor);
+}
+.existingTile{
+    background-color: var(--emptyTileColor);
+}
+.nonexistingTile{
+    background-color: var(--nonexistingTileColor);
+    border: 1px solid var(--dominoTextColor);
+    padding: 2px;
+}
+.selectedTile{
+    background-color: var(--selectedTileColor);
+}
+.constraint1Tile{
+    background-color: var(--constraintTileColor1);
+}
+.constraint2Tile{
+    background-color: var(--constraintTileColor2);
+}
+.constraint3Tile{
+    background-color: var(--constraintTileColor3);
+}
+.constraint4Tile{
+    background-color: var(--constraintTileColor4);
+}
+.constraint5Tile{
+    background-color: var(--constraintTileColor5);
+}
+.constraint6Tile{
+    background-color: var(--constraintTileColor6);
+}
+.addingConstraintTile{
+    background-color: var(--addConstraintColor);
+}
+.constraintMarker{
+    width: 22px;
+    height: 22px;
+    color: var(--emptyDominoColor);
+    text-align: center;
+    justify-items: center;
+    font-family:Arial, Helvetica, sans-serif;
+    font-weight: bolder;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+.constraintMarker1{
+    background-color: var(--constraintMarkerColor1);
+}
+.constraintMarker2{
+    background-color: var(--constraintMarkerColor2);
+}
+.constraintMarker3{
+    background-color: var(--constraintMarkerColor3);
+}
+.constraintMarker4{
+    background-color: var(--constraintMarkerColor4);
+}
+.constraintMarker5{
+    background-color: var(--constraintMarkerColor5);
+}
+.constraintMarker6{
+    background-color: var(--constraintMarkerColor16);
+}
+
+.domino{
+    display: flex;
+    border: 5px solid var(--dominoTextColor);
+    border-radius: 5px;
+    align-items: center;
+    justify-content: center;
+    margin: 15px;
+}
+.selectedDomino{
+    background-color: var(--selectedTileColor);
+}
+.dominoSquare{
+    width: var(--tileLength);
+    height: var(--tileLength);
+    align-content: center;
+    text-align: center;
+    font-size: 30px;
+}
+.dominoInput{
+    width: var(--tileLength);
+    height: var(--tileLength);
+    font-size: 30px;
+}
