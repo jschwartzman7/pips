@@ -73,9 +73,3 @@ let testConstraints = [
         value: 4,
         tiles: ["4,5"]}
 ]
-
-function removeChildren(htmlObject){
-    while(htmlObject.firstChild){
-        htmlObject.removeChild(htmlObject.firstChild);
-    }
-}

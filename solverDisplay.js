@@ -1,7 +1,5 @@
 function showSolvedBoard(){
     let builtBoard = solver.solveCSP();
-    console.log("builtBoard");
-    console.log(builtBoard);
 
     displayBoard = solver.board;
     displayDominos = solver.dominos;

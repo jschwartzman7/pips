@@ -1,9 +1,9 @@
-class CSP{
+class PipsSolver{
     constructor(board, dominos, constraints){
         this.board = board
         this.dominos = dominos
         this.constraints = constraints
-        this.buildBoard;
+        this.buildBoard = {};
 
         this.backTrackCounter = 0
     }
@@ -12,7 +12,6 @@ class CSP{
     return a mapping of board to indices of dominos subject to constraints, if all dominos can be used
     */
     solveCSP(){
-        this.buildBoard = {};
         for(let key of Object.keys(this.board)){
             this.buildBoard[key] = null;
         }
