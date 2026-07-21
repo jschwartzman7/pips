@@ -1,105 +1,81 @@
 class PipsSolver{
-    constructor(board, dominos, constraints){
-        this.board = board
-        this.dominos = dominos
-        this.constraints = constraints
-        this.buildBoard = {};
 
-        this.backTrackCounter = 0
-    }
+    static boardDominoMappings = {}
+    static backTrackCounter = 0
 
     /*
-    return a mapping of board to indices of dominos subject to constraints, if all dominos can be used
+    return boardDominoMappings if all dominos can be used, else return null
     */
-    solveCSP(){
-        for(let key of Object.keys(this.board)){
-            this.buildBoard[key] = null;
-        }
-        
-        return this.backTrack();
+    static solveCSP(board, dominos, constraints){
+        this.boardDominoMappings = {};
+        return this.backTrack(board, dominos, constraints);
     }
 
-    backTrack(){
+    static backTrack(board, dominos, constraints){
         this.backTrackCounter += 1
         if(this.backTrackCounter % 50 === 0){
             console.log(this.backTrackCounter);
         }
-        /*
-        if a constraint is violated by dominos
-            remove most recent tile
-            return
-        if there are unused dominos
-            add a domino to an open space
-            backTrack
-        return buildBoard
-        */
+        
         let numUsedTiles = this.getNumUsedTiles();
-        if(numUsedTiles == this.dominos.length){
-            return this.buildBoard;
+        if(numUsedTiles == dominos.length){
+            if(this.isSatisfyingConstraints(board, dominos, constraints)){
+                return this.boardDominoMappings;
+            }
+            return null
         }
-        let newDomino = this.dominos[numUsedTiles];
-        for(let openSpace of this.getOpenSpaces()){
-            this.board[openSpace[0]] = newDomino[0];
-            this.board[openSpace[1]] = newDomino[1];
-            this.buildBoard[openSpace[0]] = numUsedTiles;
-            this.buildBoard[openSpace[1]] = numUsedTiles;
-            if(this.canSatisfyConstraints()){
-                let result = this.backTrack();
+        let newDomino = dominos[numUsedTiles];
+        for(let openSpace of this.getOpenSpaces(board)){
+            this.boardDominoMappings[numUsedTiles] = [openSpace[0], openSpace[1]]
+            board[openSpace[0]] = Number(newDomino[0]);
+            board[openSpace[1]] = Number(newDomino[1]);
+            if(this.canSatisfyConstraints(board, dominos, constraints)){
+                let result = this.backTrack(board, dominos, constraints);
                 if(result !== null){
                     return result;
                 }
             }
-            
-            this.board[openSpace[0]] = newDomino[1];
-            this.board[openSpace[1]] = newDomino[0];
-            if(this.canSatisfyConstraints()){
-                let result = this.backTrack();
+            this.boardDominoMappings[numUsedTiles] = [openSpace[1], openSpace[0]]
+            board[openSpace[0]] = Number(newDomino[1]);
+            board[openSpace[1]] = Number(newDomino[0]);
+            if(this.canSatisfyConstraints(board, dominos, constraints)){
+                let result = this.backTrack(board, dominos, constraints);
                 if(result !== null){
                     return result;
                 }
             }
-
-            this.board[openSpace[0]] = null;
-            this.board[openSpace[1]] = null;
-            this.buildBoard[openSpace[0]] = null;
-            this.buildBoard[openSpace[1]] = null;
+            delete this.boardDominoMappings[numUsedTiles]
+            board[openSpace[0]] = null;
+            board[openSpace[1]] = null;
         }
         return null;
     }
 
-
-    getNumUsedTiles(){
-        let usedTiles = new Set();
-        for(let val of Object.values(this.buildBoard)){
-            if(val !== null){
-                usedTiles.add(val);
-            }
-        }
-        return usedTiles.size;
+    static getNumUsedTiles(){
+        return Object.keys(this.boardDominoMappings).length;
     }
 
-    getOpenSpaces(){
-        /* return [[[0,0],[1,0]], [[0,1],[1,1]]] */
+    static getOpenSpaces(board){
+        /* return [["0,0", "1,0"], ["0,1", "1,1"]] */
         let openSpaces = [];
-        for(let space of Object.keys(this.board)){
+        for(let space of Object.keys(board)){
+            if(Object.values(this.boardDominoMappings).flat().includes(space)){
+                continue;
+            }
             let x = Number(space.split(",")[0]);
             let y = Number(space.split(",")[1]);
-            if(this.buildBoard[x + "," + y] !== null){
-                continue
+            if(!Object.values(this.boardDominoMappings).flat().includes((x+1) + "," + y) && Object.keys(board).includes((x+1) + "," + y)){
+                openSpaces.push([(x + "," + y), ((x+1) + "," + y)]);
             }
-            if(this.buildBoard[(x+1) + "," + y] === null){
-                openSpaces.push([[x + "," + y],[(x+1) + "," + y]]);
-            }
-            if(this.buildBoard[x + "," + (y+1)] === null){
-                openSpaces.push([[x + "," + y],[x + "," + (y+1)]]);
+            if(!Object.values(this.boardDominoMappings).flat().includes(x + "," + (y+1)) && Object.keys(board).includes(x + "," + (y+1))){
+                openSpaces.push([(x + "," + y), (x + "," + (y+1))]);
             }
         }
         return openSpaces;
     }
 
 
-    generateSubsetSums(arr, chosenIndices, k, currentSums, currentIndex){
-        /* generate combinations not permutations*/
+    /*static generateSubsetSums(arr, chosenIndices, k, currentSums, currentIndex){
         if(chosenIndices.length === k){
             let sum = 0;
             for(let idx of chosenIndices){
@@ -117,168 +93,200 @@ class PipsSolver{
         this.generateSubsetSums(arr, chosenIndices, k, currentSums, currentIndex+1);
         chosenIndices.pop();
         this.generateSubsetSums(arr, chosenIndices, k, currentSums, currentIndex+1);
+    }*/
+
+    static arraySum(arr){
+        return arr.reduce((accumulator, currentValue) => accumulator + currentValue);
     }
 
-    canSatisfyConstraints(){
+    static canSatisfyConstraints(board, dominos, constraints){
         /* 
         To estimate for unfilled tiles, maintain of set of subset sums of size numUnfilled to guess if it can be satisfied.
         */
-        let subsetSums = {}
-        let dominoValues = []
-        let numUnfilled = 0;
-        for(let constraint of constraints){
-            numUnfilled = 0;
-            for(let tile of constraint.tiles){
-                if(this.board[tile] === null){
-                    numUnfilled++;
-                }
-            }
-            if(numUnfilled > 0){
-                for(let dominoIdx = 0; dominoIdx < this.dominos.length; ++dominoIdx){
-                    if(!(Object.values(this.buildBoard).includes(dominoIdx))){
-                        dominoValues.push(this.dominos[dominoIdx][0]);
-                        dominoValues.push(this.dominos[dominoIdx][1]);
-                    }
-                }
-                let subsetSumsNumUnfilled = []
-                this.generateSubsetSums(dominoValues, [], numUnfilled, subsetSumsNumUnfilled, 0);
-                subsetSums[numUnfilled] = subsetSumsNumUnfilled
+        let unusedDominoValues = []
+        for(let dominoIdx = 0; dominoIdx < dominos.length; ++dominoIdx){
+            if(!(Object.keys(this.boardDominoMappings).includes(dominoIdx))){
+                unusedDominoValues.push(dominos[dominoIdx][0]);
+                unusedDominoValues.push(dominos[dominoIdx][1]);
             }
         }
         for(let constraint of constraints){
-            if(!this.isConstraintSatisfied(constraint, subsetSums, dominoValues)){
+            if(!this.canSatisfyConstraint(constraint, unusedDominoValues.toSorted(), board)){
                 return false;
             }
         }
         return true;
     }
 
-    isConstraintSatisfied(constraint, subsetSums, dominoValues){
+    static canSatisfyConstraint(constraint, unusedDominoValues, board){
+        /* Cannot return false negatives; Cannot return false when constraint can be satisfied */
+        /* Can return false positives; Can return true when constraint cannot be satisfied */
         let sum = 0;
         let numEmpty = 0
         switch (constraint.type) {
             case "<":
                 for(let tile of constraint.tiles){
-                    if(this.board[tile] === null){
+                    if(board[tile] === null){
                         numEmpty++;
                     }
                     else{
-                        sum += this.board[tile];
+                        sum += board[tile];
                     }
                 }
                 if(sum >= constraint.value){
                     return false;
                 }
-                if(numEmpty === 0){
-                    return true;
-                }
-                if(Math.min(subsetSums[numEmpty]) + sum >= constraint.value){
-                    return false;
+                if(numEmpty > 0){
+                    if(this.arraySum(unusedDominoValues.slice(0, numEmpty)) + sum >= constraint.value){
+                        return false;
+                    }
                 }
                 return true;
             case "=":
                 for(let tile of constraint.tiles){
-                    if(this.board[tile] === null){
+                    if(board[tile] === null){
                         numEmpty++;
                     }
                     else{
-                        sum += this.board[tile];
+                        sum += board[tile];
                     }
                 }
                 if(sum > constraint.value){
                     return false;
                 }
-                if(numEmpty === 0){
-                    if(sum === constraint.value){
-                        return true;
-                    }
-                    return false;
-                }
-                for(let subsetSum of subsetSums[numEmpty]){
-                    if(sum + subsetSum === constraint.value){
-                        return true;
-                    }
-                }
-                return false;
+                return true;
             case ">":
                 for(let tile of constraint.tiles){
-                    if(this.board[tile] === null){
+                    if(board[tile] === null){
                         numEmpty++;
                     }
                     else{
-                        sum += this.board[tile];
+                        sum += board[tile];
                     }
                 }
-                if(sum > constraint.value){
-                    return true;
+                if(numEmpty > 0){
+                    if(this.arraySum(unusedDominoValues.slice(-numEmpty)) + sum <= constraint.value){
+                        return false;
+                    }
                 }
-                if(numEmpty === 0){
-                    return false;
-                }
-                if(Math.max(subsetSums[numEmpty]) + sum <= constraint.value){
+                else if(sum <= constraint.value){
                     return false;
                 }
                 return true;
             case "==":
                 let tileValue = null;
                 for(let tile of constraint.tiles){
-                    if(this.board[tile] === null){
+                    if(board[tile] === null){
                         numEmpty++;
                     }
                     if(tileValue === null){
-                        tileValue = this.board[tile];
+                        tileValue = board[tile];
                     }
                     else{
-                        if(this.board[tile] !== tileValue){
+                        if(board[tile] !== tileValue){
                             return false;
                         }
                     }
                 }
-                if(numEmpty === 0){
-                    return true;
+                if(numEmpty > 0){
+                    if(unusedDominoValues.filter(v => v === tileValue).length < numEmpty){
+                        return false;
+                    }
                 }
-                if(dominoValues.filter(v => v === tileValue).length >= numEmpty){
-                    return true;
-                }
-                return false;
+                return true;
             case "!=":
-                let counter = new Set();
+                let uniqueTiles = new Set();
                 for(let tile of constraint.tiles){
-                    if(this.board[tile] === null){
+                    if(board[tile] === null){
                         numEmpty++;
                     }
                     else{
-                        if(counter.has(this.board[tile])){
+                        if(uniqueTiles.has(this.board[tile])){
                             return false;
                         }
-                        counter.add(buildBoard[tile])
+                        uniqueTiles.add(this.board[tile]);
                     }
                 }
-                if(numEmpty === 0){
-                    return true;
+                if(numEmpty > 0){
+                    if(unusedDominoValues.filter(v => v !== tileValue).length < numEmpty){
+                        return false;
+                    }
                 }
-                if(dominoValues.filter(v => v !== tileValue).length >= numEmpty){
-                    return true;
-                }
-                return false;
+                return true;
             default:
                 break;
         }
     }
-}
 
-/*function checkPlaceDomino(){
-    let selectedDomino = document.querySelector(".selectedDomino");
-    if(selectedDomino === null || selectedIndices.size !== 2){
-        return;
+    static isSatisfyingConstraints(board, dominos, constraints){
+        for(let constraint of constraints){
+            if(!this.isSatisfyingConstraint(constraint, board)){
+                return false;
+            }
+        }
+        return true;
     }
-    let dominoV1 = selectedDomino.childNodes[0].innerHTML;
-    let dominoV2 = selectedDomino.childNodes[1].innerHTML;
-    let selectedIndicesArray = Array.from(selectedIndices);
-    let tile1 = document.getElementById(selectedIndicesArray[0]);
-    let tile2 = document.getElementById(selectedIndicesArray[1]);
-    tile1.innerHTML = dominoV1;
-    tile2.innerHTML = dominoV2;
-    selectedDomino.className = "domino";
-    selectedIndices.clear();
-}*/
+
+    static isSatisfyingConstraint(constraint, board){
+        let sum = 0;
+        let numEmpty = 0
+        switch (constraint.type) {
+            case "<":
+                for(let tile of constraint.tiles){
+                    if(board[tile] !== null){
+                        sum += board[tile];
+                    }
+                }
+                if(sum >= constraint.value){
+                    return false;
+                }
+                return true;
+            case "=":
+                for(let tile of constraint.tiles){
+                    if(board[tile] === null){
+                        numEmpty++;
+                    }
+                    else{
+                        sum += board[tile];
+                    }
+                }
+                if(sum !== constraint.value){
+                    return false;
+                }
+                return true;
+            case ">":
+                for(let tile of constraint.tiles){
+                    if(board[tile] === null){
+                        numEmpty++;
+                    }
+                    else{
+                        sum += board[tile];
+                    }
+                }
+                if(sum <= constraint.value){
+                    return false;
+                }
+                return true;
+            case "==":
+                let tileValue = constraint.tiles[0];
+                for(let tile of constraint.tiles){
+                    if(board[tile] !== tileValue){
+                        return false;
+                    }
+                }
+                return true;
+            case "!=":
+                let uniqueTiles = new Set();
+                for(let tile of constraint.tiles){
+                    if(uniqueTiles.has(this.board[tile])){
+                        return false;
+                    }
+                    uniqueTiles.add(this.board[tile]);
+                }
+                return true;
+            default:
+                break;
+        }
+    }
+
+}

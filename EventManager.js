@@ -5,26 +5,33 @@ class EventManager{
 
     constructor(){
         document.body.addEventListener("click", event => EventManager.clickHandler(event));
-        document.getElementById("dominosContainer").addEventListener("change", event => EventManager.dominoChangeHandler());
-        document.addEventListener('keydown', (event) => {if(event.key === "Shift"){EventManager.shiftKeyPressed = true;}});
-        document.addEventListener('keyup', (event) => {if(event.key === "Shift"){EventManager.shiftKeyPressed = false;}});
+        document.getElementById("dominosContainer").addEventListener("change", () => EventManager.dominoChangeHandler());
+        document.addEventListener("keydown", (event) => {if(event.key === "Shift"){EventManager.shiftKeyPressed = true}});
+        document.addEventListener("keyup", (event) => {if(event.key === "Shift"){EventManager.shiftKeyPressed = false}});
     }
 
     static clickHandler(event){
         switch(event.target.dataset.type){
+            case("solvePuzzleButton"):
+                PipsState.solvePuzzleClick();
+                break;
             case("tile"):
                 PipsState.tileClick(event.target.dataset.key);
                 break;
             case("dominoPip"):
+                let dominoIndex = Number(event.target.parentElement.dataset.index)
                 if(this.shiftKeyPressed){
-                    PipsState.deleteDominoClick(event.target.parentElement.dataset.index);
+                    PipsState.deleteDominoClick(dominoIndex);
                 }
                 else{
-                    PipsState.toggleDominoClick(event.target.parentElement.dataset.index);
+                    PipsState.toggleDominoClick(dominoIndex);
                 }
                 break;
             case("addConstraintButton"):
                 PipsState.addConstraintClick();
+                break;
+            case("constraintColor"):
+                PipsState.deleteConstraint(event.target.dataset.index);
                 break;
             default:
                 return;
@@ -37,10 +44,23 @@ class EventManager{
     static dominoChangeHandler(){
         let input1 = document.getElementById("dominoInput1").value;
         let input2 = document.getElementById("dominoInput2").value;
-        if(isNaN(input1) || isNaN(input2) || input1 === "" || input2 === "" || input1%1 !== 0 || input2%1 !== 0){
-            return false
+        if(PipsState.tryAddDomino(input1, input2)){
+            DominosDisplay.displayDominos(PipsState.state);
         }
-        PipsState.addDomino(input1, input2);
-        DominosDisplay.displayDominos(PipsState.state);
     }
+
+    static mouseEnterDomino(domino){
+        this.dominosHoverInterval = setInterval(() => {
+            if(this.shiftKeyPressed){
+                domino.classList.add("deletingDomino");
+                }
+            else{
+                domino.classList.remove("deletingDomino");
+            }
+        }, 100);
+    }
+    static mouseLeaveDomino(){
+        clearInterval(EventManager.dominosHoverInterval);
+    }
+
 }

@@ -11,6 +11,11 @@ class PipsState{
                     addingConstraintTiles: null, /* ["0,0", "1,0", ...] existing tileKeys */
                     };
 
+    static isWholeNumber(x){
+        let reg = /^(0|[1-9]\d*)$/;
+        return reg.test(x);
+    }
+
     static tileClick(tileKey){
         if(!this.state.board.includes(tileKey)){/*nonexisting tile*/
             this.state.board.push(tileKey);
@@ -43,21 +48,37 @@ class PipsState{
                 this.state.addingConstraintTiles.push(tileKey);
             }
         }
-        else{/*delete tile*/
-            for(let dominoKey in this.state.boardDominoMappings){
+        else{/*empty tile*/
+            for(let dominoKey in this.state.boardDominoMappings){/* remove overlapping domino */
                 if(this.state.boardDominoMappings[dominoKey][0] === tileKey || this.state.boardDominoMappings[dominoKey][1] === tileKey){
                     delete this.state.boardDominoMappings[dominoKey];
-                    break;
+                    return;
                 }
             }
-            this.removeTilesFromConstraints([tileKey]);
-            this.state.board.splice(this.state.board.indexOf(tileKey), 1);
+            let constrainedTile = false;
+            if(this.removeTilesFromConstraints([tileKey])){/* remove overlapping constraint */
+                constrainedTile = true;
+            };
+            if(!constrainedTile){
+                this.state.board.splice(this.state.board.indexOf(tileKey), 1);
+            }
+            
+        }
+    }
+
+    static updateBoardDominoMappings(deletedDominoIndex){
+        for(let dominoIndex in this.state.boardDominoMappings){
+            if(Number(dominoIndex) > deletedDominoIndex){
+                this.state.boardDominoMappings[Number(dominoIndex)-1] = this.state.boardDominoMappings[dominoIndex];
+                delete this.state.boardDominoMappings[dominoIndex];
+            }
         }
     }
 
     static deleteDominoClick(dominoIndex){
         this.state.dominos.splice(dominoIndex, 1);
         delete this.state.boardDominoMappings[dominoIndex];
+        this.updateBoardDominoMappings(dominoIndex)
         if(this.state.selectedDominoIndex !== -1){/*selected domino exists*/
             if(dominoIndex === this.state.selectedDominoIndex){/*selected domino clicked*/
                 this.resetAddDomino();
@@ -109,17 +130,33 @@ class PipsState{
         }
     }
 
-    static addDomino(v1, v2){
-        this.state.dominos.push([v1, v2]);
+    static tryAddDomino(v1, v2){
+        if(this.isWholeNumber(v1) && this.isWholeNumber(v2)){
+            this.state.dominos.push([v1, v2]);
+            return true;
+        }
+        return false;
+    }
+
+    static resetAddConstraint(){
+        this.state.addingConstraintTiles = null;
+        document.getElementById("newConstraintType").value = "";
+        document.getElementById("newConstraintValue").value = "";
+    }
+
+    static deleteConstraint(constraintIndex){
+        this.state.constraints.splice(constraintIndex, 1);
     }
 
     static removeTilesFromConstraints(tilesToRemove){
         /* Removes tilesToRemove from any overlapping constraints, deleting the constraint if no remaining tiles exist */
         let constraintsToRemove = [];
+        let modifiedState = false;
         for(let constraint of this.state.constraints){
             for(let tileToRemove of tilesToRemove){
                 if(constraint.tiles.includes(tileToRemove)){
                     constraint.tiles.splice(constraint.tiles.indexOf(tileToRemove), 1);
+                    modifiedState = true;
                 }
             }
             if(constraint.tiles.length === 0){
@@ -129,22 +166,33 @@ class PipsState{
         for(let constraintToRemove of constraintsToRemove){
             this.state.constraints.splice(this.state.constraints.indexOf(constraintToRemove), 1)
         }
+        return modifiedState;
     }
 
     static tryAddConstraint(){
         if(this.state.addingConstraintTiles == null){return};
         let constraintType = document.getElementById("newConstraintType").value;
         let constraintValue = document.getElementById("newConstraintValue").value;
-        if(this.state.addingConstraintTiles.length > 0 && ["<", "=", ">", "==", "!="].includes(constraintType) && (["==", "!="].includes(constraintType) || !isNaN(Number(constraintValue)))){
-            /*let constraintTiles = this.state.addingConstraintTiles;*/
+        if(this.state.addingConstraintTiles.length > 0 && ["<", "=", ">", "==", "!="].includes(constraintType) && (["==", "!="].includes(constraintType) || this.isWholeNumber(constraintValue))){
             this.removeTilesFromConstraints(this.state.addingConstraintTiles);
             this.state.constraints.push({type: constraintType,
                                         value: constraintValue,
                                         tiles: this.state.addingConstraintTiles});
         }
-        this.state.addingConstraintTiles = null;
-        document.getElementById("newConstraintType").value = "";
-        document.getElementById("newConstraintValue").value = "";
+        this.resetAddConstraint()
+    }
+
+    static solvePuzzleClick(){
+        let solverBoard = Object.fromEntries(this.state.board.map(tileKey => [tileKey, null]));
+        let result = PipsSolver.solveCSP(solverBoard, this.state.dominos, this.state.constraints);
+        if(result === null){
+            alert("No Solution");
+        }
+        else{
+            this.state.boardDominoMappings = result;
+            this.resetAddDomino();
+            this.resetAddConstraint();
+        }
     }
 
 }

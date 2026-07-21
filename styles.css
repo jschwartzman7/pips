@@ -1,9 +1,9 @@
 :root {
+    --nonexistingTileColor: white;
     --emptyTileColor: #e1cbc5;
     --tileBorderColor: #dbc2ba;
     --dominoTextColor: #444444;
     --emptyDominoColor: #f5efee;
-    --nonexistingTileColor: white;
     --selectedTileColor: #d63852;
     --addConstraintColor: #4aa1e9;
     --pushingDominoValueTile1: #69e38c;
@@ -16,13 +16,6 @@
     --constraintTileColor4: #b8b191;
     --constraintTileColor5: #eabd97;
     --constraintTileColor6: #c4a3c0;
-
-    --constraintMarkerColor1: #db127a;
-    --constraintMarkerColor2: #008393;
-    --constraintMarkerColor3: #124076;
-    --constraintMarkerColor4: #547602;
-    --constraintMarkerColor5: #d15609;
-    --constraintMarkerColor6: #9351cb;
 }
 body{
     background-color: white;
@@ -32,20 +25,15 @@ body{
     font-family:monospace;
 }
 #solvePuzzleButton{
-    background-color: #d63852;
+    padding: 10px;
+    border: 2px solid black;
+    border-radius: 10px;
+    font-family:monospace;
+    font-size:large;
 }
-#dominosContainer{
-    display: flex;
-    flex-wrap: wrap;
-}
-#addConstraintContainer{
-    text-align: center;
-    padding: 5px;
-    border: 3px solid var(--dominoTextColor);
-}
-#toggleAddConstraint{
-    border: 2px solid var(--addConstraintColor);
-    cursor: pointer;
+#boardContainer{
+    margin-top:10px;
+    border: 3px solid black;
 }
 .boardRow{
     display: flex;
@@ -54,44 +42,41 @@ body{
     width: var(--tileLength);
     height: var(--tileLength);;
     border: 3px solid var(--tileBorderColor);
-    position: relative;
     font-size: 35px;
     text-align: center;
     align-content: center;
-}
-.toggleAddConstraintActive{
-    background-color: var(--addConstraintColor);
-}
-.existingTile{
-    background-color: var(--emptyTileColor);
 }
 .nonexistingTile{
     background-color: var(--nonexistingTileColor);
     border: 1px solid var(--dominoTextColor);
     padding: 2px;
 }
+.existingTile{
+    background-color: var(--emptyTileColor);
+}
 .topDominoTile{
     border: 3px solid var(--dominoTextColor);
     background-color: white;
     border-bottom: 3px solid white;
+    border-radius: 5px;
 }
 .bottomDominoTile{
     border: 3px solid var(--dominoTextColor);
     background-color: white;
     border-top: 3px solid white;
+    border-radius: 5px;
 }
 .leftDominoTile{
     border: 3px solid var(--dominoTextColor);
     background-color: white;
     border-right: 3px solid white;
+    border-radius: 5px;
 }
 .rightDominoTile{
     border: 3px solid var(--dominoTextColor);
     background-color: white;
     border-left: 3px solid white;
-}
-.selectedTile{
-    background-color: var(--selectedTileColor);
+    border-radius: 5px;
 }
 .constraint0Tile{
     background-color: var(--constraintTileColor1);
@@ -114,57 +99,20 @@ body{
 .addingConstraintTile{
     background-color: var(--addConstraintColor);
 }
-.constraintMarker{
-    width: 22px;
-    height: 22px;
-    color: var(--emptyDominoColor);
-    text-align: center;
-    justify-items: center;
-    font-family:Arial, Helvetica, sans-serif;
-    font-weight: bolder;
-    border-radius: 50%;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-}
-.constraintContainer{
-    display:flex;
-    align-items: center;
-    margin: 10px;
-}
-.constraintColor{
-    width:25px;
-    height:25px;
-    margin: 10px;
-}
-.constraintMarker1{
-    background-color: var(--constraintMarkerColor1);
-}
-.constraintMarker2{
-    background-color: var(--constraintMarkerColor2);
-}
-.constraintMarker3{
-    background-color: var(--constraintMarkerColor3);
-}
-.constraintMarker4{
-    background-color: var(--constraintMarkerColor4);
-}
-.constraintMarker5{
-    background-color: var(--constraintMarkerColor5);
-}
-.constraintMarker6{
-    background-color: var(--constraintMarkerColor16);
-}
 .pushingDominoValueTile1{
     background-color: var(--pushingDominoValueTile1);
 }
 .pushingDominoValueTile2{
     background-color: var(--pushingDominoValueTile2);
 }
+#dominosContainer{
+    display: flex;
+    flex-wrap: wrap;
+}
 .domino{
     display: flex;
     border: 5px solid var(--dominoTextColor);
-    border-radius: 5px;
+    border-radius: 10px;
     align-items: center;
     justify-content: center;
     margin: 15px;
@@ -192,5 +140,44 @@ body{
 .dominoInput{
     width: var(--tileLength);
     height: var(--tileLength);
+    font-family: monospace;
     font-size: 30px;
+}
+#addConstraintContainer{
+    text-align: center;
+    padding: 7px;
+    border: 3px solid var(--dominoTextColor);
+    border-radius: 10px;
+    width: 250px;
+    height: 80px;
+}
+#addConstraintButton{
+    border: 3px solid var(--addConstraintColor);
+    border-radius: 10px;
+    font-size:x-large;
+    cursor: pointer;
+    padding:5px;
+}
+.addConstraintButtonActive{
+    background-color: var(--addConstraintColor);
+}
+.constraintInput{
+    font-family:monospace;
+    font-size:x-large;
+    border:2px solid black;
+    height:30px;
+    width:85px;
+    margin:5px;
+    border-radius: 10px;
+}
+.constraintContainer{
+    display:flex;
+    align-items: center;
+    margin: 10px;
+}
+.constraintColor{
+    width:25px;
+    height:25px;
+    margin: 10px;
+    cursor: not-allowed;
 }

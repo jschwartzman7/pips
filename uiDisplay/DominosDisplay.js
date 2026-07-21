@@ -19,7 +19,7 @@ class DominosDisplay{
     static createDomino(state, dominoIdx){
         let domino = document.createElement("div");
         domino.className = "domino";
-        if(dominoIdx === Number(state.selectedDominoIndex)){
+        if(dominoIdx === state.selectedDominoIndex){
             domino.classList.add("selectedDomino")
         }
         else if(Object.keys(state.boardDominoMappings).includes(String(dominoIdx))){
@@ -37,26 +37,10 @@ class DominosDisplay{
         domino.appendChild(dominoSquare2);
         domino.dataset.type = "domino"
         domino.dataset.index = dominoIdx;
-        domino.addEventListener("mouseenter", function(){ 
-            if (EventManager.dominosHoverInterval === null) {
-                EventManager.dominosHoverInterval = setInterval(() => {
-                    if(EventManager.shiftKeyPressed){
-                        domino.classList.add("deletingDomino");
-                        }
-                    else{
-                        domino.classList.remove("deletingDomino");
-                    }
-                }, 100);
-            }
-        });
-        domino.addEventListener("mouseleave", function(){
-            if (EventManager.dominosHoverInterval) {
-                clearInterval(EventManager.dominosHoverInterval);
-                EventManager.dominosHoverInterval = null;
-            }
-        });
+        domino.addEventListener("mouseover", () => {EventManager.mouseEnterDomino(domino)});
+        domino.addEventListener("mouseleave", () => {EventManager.mouseLeaveDomino(domino)});
         return domino;
-    }
+    };
 
     static displayDominos(state){
         let dominosContainer = document.getElementById("dominosContainer");

@@ -23,7 +23,7 @@ class BoardDisplay{
         let tile = document.createElement("div");
         tile.dataset.type = "tile";
         tile.dataset.key = tileKey;
-        tile.classList.add("tile");
+        tile.className = "tile";
         if(!state.board.includes(tileKey)){/*nonexisting tile*/
             tile.classList.add("nonexistingTile");
             return tile;

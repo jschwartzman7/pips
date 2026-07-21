@@ -5,6 +5,8 @@ class ConstraintsDisplay{
         constraintContainer.className = "constraintContainer";
         let constraintColor = document.createElement("div");
         constraintColor.className = "constraintColor constraint"+constraintIdx+"Tile";
+        constraintColor.dataset.type = "constraintColor";
+        constraintColor.dataset.index = constraintIdx;
         let constraintText = document.createElement("div");
         constraintContainer.appendChild(constraintColor);
         constraintContainer.appendChild(constraintText);
@@ -15,10 +17,10 @@ class ConstraintsDisplay{
 
     static displayConstraints(state){
         if(state.addingConstraintTiles !== null){
-            document.getElementById("toggleAddConstraint").classList.add("toggleAddConstraintActive");
+            document.getElementById("addConstraintButton").classList.add("addConstraintButtonActive");
         }
         else{
-            document.getElementById("toggleAddConstraint").classList.remove("toggleAddConstraintActive");
+            document.getElementById("addConstraintButton").classList.remove("addConstraintButtonActive");
         }
         let constraintsContainer = document.getElementById("constraintsContainer");
         removeChildren(constraintsContainer);

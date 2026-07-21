@@ -8,18 +8,19 @@
 </head>
 <body>
     <h1>Pips Program</h1>
-    <button id="solvePuzzleButton">Solve Puzzle</button>
+    <button data-type="solvePuzzleButton" id="solvePuzzleButton">Solve Puzzle</button>
     <div id="boardContainer"></div>
     <div id="dominosContainer"></div>
     <div id="addConstraintContainer">
-        <div data-type="addConstraintButton" id="toggleAddConstraint">Add Constraint</div>
-        <input id="newConstraintType" placeholder="type">
-        <input id="newConstraintValue" placeholder="value">
+        <div data-type="addConstraintButton" id="addConstraintButton">Add Constraint</div>
+        <input id="newConstraintType" class="constraintInput" placeholder="type">
+        <input id="newConstraintValue" class="constraintInput" placeholder="value">
     </div>
     <div id="constraintsContainer"></div>
     <script src="uiDisplay/BoardDisplay.js"></script>
     <script src="uiDisplay/DominosDisplay.js"></script>
     <script src="uiDisplay/ConstraintsDisplay.js"></script>
+    <script src="PipsSolver.js"></script>
     <script src="PipsState.js"></script>
     <script src="EventManager.js"></script>
     <script src="Main.js"></script>
