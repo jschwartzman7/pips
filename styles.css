@@ -16,6 +16,15 @@
     --constraintTileColor4: #b8b191;
     --constraintTileColor5: #eabd97;
     --constraintTileColor6: #c4a3c0;
+    --constraintTileColor7: #eba2af;
+    --constraintTileColor8: #adc0c1;
+    --constraintTileColor9: #a5a2ae;
+    --constraintTileColor10: #b8b191;
+    --constraintTileColor11: #eabd97;
+    --constraintTileColor12: #c4a3c0;
+    --constraintTileColor13: #eba2af;
+    --constraintTileColor14: #adc0c1;
+    --constraintTileColor15: #a5a2ae;
 }
 body{
     background-color: white;
@@ -96,6 +105,33 @@ body{
 .constraint5Tile{
     background-color: var(--constraintTileColor6);
 }
+.constraint6Tile{
+    background-color: var(--constraintTileColor7);
+}
+.constraint7Tile{
+    background-color: var(--constraintTileColor8);
+}
+.constraint8Tile{
+    background-color: var(--constraintTileColor9);
+}
+.constraint9Tile{
+    background-color: var(--constraintTileColor10);
+}
+.constraint10Tile{
+    background-color: var(--constraintTileColor11);
+}
+.constraint11Tile{
+    background-color: var(--constraintTileColor12);
+}
+.constraint12Tile{
+    background-color: var(--constraintTileColor13);
+}
+.constraint13Tile{
+    background-color: var(--constraintTileColor14);
+}
+.constraint14Tile{
+    background-color: var(--constraintTileColor15);
+}
 .addingConstraintTile{
     background-color: var(--addConstraintColor);
 }
@@ -169,6 +205,9 @@ body{
     width:85px;
     margin:5px;
     border-radius: 10px;
+}
+#constraintsContainer{
+    display:flex;
 }
 .constraintContainer{
     display:flex;

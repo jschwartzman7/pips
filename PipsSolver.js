@@ -16,17 +16,16 @@ class PipsSolver{
         if(this.backTrackCounter % 50 === 0){
             console.log(this.backTrackCounter);
         }
-        
-        let numUsedTiles = this.getNumUsedTiles();
-        if(numUsedTiles == dominos.length){
+        let numUsedDominos = this.getNumUsedDominos();
+        if(numUsedDominos == dominos.length){
             if(this.isSatisfyingConstraints(board, dominos, constraints)){
                 return this.boardDominoMappings;
             }
             return null
         }
-        let newDomino = dominos[numUsedTiles];
+        let newDomino = dominos[numUsedDominos];
         for(let openSpace of this.getOpenSpaces(board)){
-            this.boardDominoMappings[numUsedTiles] = [openSpace[0], openSpace[1]]
+            this.boardDominoMappings[numUsedDominos] = [openSpace[0], openSpace[1]]
             board[openSpace[0]] = Number(newDomino[0]);
             board[openSpace[1]] = Number(newDomino[1]);
             if(this.canSatisfyConstraints(board, dominos, constraints)){
@@ -35,7 +34,7 @@ class PipsSolver{
                     return result;
                 }
             }
-            this.boardDominoMappings[numUsedTiles] = [openSpace[1], openSpace[0]]
+            this.boardDominoMappings[numUsedDominos] = [openSpace[1], openSpace[0]]
             board[openSpace[0]] = Number(newDomino[1]);
             board[openSpace[1]] = Number(newDomino[0]);
             if(this.canSatisfyConstraints(board, dominos, constraints)){
@@ -44,14 +43,14 @@ class PipsSolver{
                     return result;
                 }
             }
-            delete this.boardDominoMappings[numUsedTiles]
+            delete this.boardDominoMappings[numUsedDominos]
             board[openSpace[0]] = null;
             board[openSpace[1]] = null;
         }
         return null;
     }
 
-    static getNumUsedTiles(){
+    static getNumUsedDominos(){
         return Object.keys(this.boardDominoMappings).length;
     }
 
@@ -104,10 +103,10 @@ class PipsSolver{
         To estimate for unfilled tiles, maintain of set of subset sums of size numUnfilled to guess if it can be satisfied.
         */
         let unusedDominoValues = []
-        for(let dominoIdx = 0; dominoIdx < dominos.length; ++dominoIdx){
+        for(let dominoIdx in dominos){
             if(!(Object.keys(this.boardDominoMappings).includes(dominoIdx))){
-                unusedDominoValues.push(dominos[dominoIdx][0]);
-                unusedDominoValues.push(dominos[dominoIdx][1]);
+                unusedDominoValues.push(Number(dominos[dominoIdx][0]));
+                unusedDominoValues.push(Number(dominos[dominoIdx][1]));
             }
         }
         for(let constraint of constraints){
@@ -133,11 +132,11 @@ class PipsSolver{
                         sum += board[tile];
                     }
                 }
-                if(sum >= constraint.value){
+                if(sum >= Number(constraint.value)){
                     return false;
                 }
                 if(numEmpty > 0){
-                    if(this.arraySum(unusedDominoValues.slice(0, numEmpty)) + sum >= constraint.value){
+                    if(this.arraySum(unusedDominoValues.slice(0, numEmpty)) + sum >= Number(constraint.value)){
                         return false;
                     }
                 }
@@ -151,7 +150,7 @@ class PipsSolver{
                         sum += board[tile];
                     }
                 }
-                if(sum > constraint.value){
+                if(sum > Number(constraint.value)){
                     return false;
                 }
                 return true;
@@ -165,27 +164,22 @@ class PipsSolver{
                     }
                 }
                 if(numEmpty > 0){
-                    if(this.arraySum(unusedDominoValues.slice(-numEmpty)) + sum <= constraint.value){
+                    if(this.arraySum(unusedDominoValues.slice(-numEmpty)) + sum <= Number(constraint.value)){
                         return false;
                     }
                 }
-                else if(sum <= constraint.value){
+                else if(sum <= Number(constraint.value)){
                     return false;
                 }
                 return true;
             case "==":
-                let tileValue = null;
+                let tileValue = board[constraint.tiles[0]];
                 for(let tile of constraint.tiles){
                     if(board[tile] === null){
                         numEmpty++;
                     }
-                    if(tileValue === null){
-                        tileValue = board[tile];
-                    }
-                    else{
-                        if(board[tile] !== tileValue){
-                            return false;
-                        }
+                    else if(board[tile] !== tileValue){
+                        return false;
                     }
                 }
                 if(numEmpty > 0){
@@ -207,11 +201,6 @@ class PipsSolver{
                         uniqueTiles.add(this.board[tile]);
                     }
                 }
-                if(numEmpty > 0){
-                    if(unusedDominoValues.filter(v => v !== tileValue).length < numEmpty){
-                        return false;
-                    }
-                }
                 return true;
             default:
                 break;
@@ -229,7 +218,6 @@ class PipsSolver{
 
     static isSatisfyingConstraint(constraint, board){
         let sum = 0;
-        let numEmpty = 0
         switch (constraint.type) {
             case "<":
                 for(let tile of constraint.tiles){
@@ -237,38 +225,32 @@ class PipsSolver{
                         sum += board[tile];
                     }
                 }
-                if(sum >= constraint.value){
+                if(sum >= Number(constraint.value)){
                     return false;
                 }
                 return true;
             case "=":
                 for(let tile of constraint.tiles){
-                    if(board[tile] === null){
-                        numEmpty++;
-                    }
-                    else{
+                    if(board[tile] !== null){
                         sum += board[tile];
                     }
                 }
-                if(sum !== constraint.value){
+                if(sum !== Number(constraint.value)){
                     return false;
                 }
                 return true;
             case ">":
                 for(let tile of constraint.tiles){
-                    if(board[tile] === null){
-                        numEmpty++;
-                    }
-                    else{
+                    if(board[tile] !== null){
                         sum += board[tile];
                     }
                 }
-                if(sum <= constraint.value){
+                if(sum <= Number(constraint.value)){
                     return false;
                 }
                 return true;
             case "==":
-                let tileValue = constraint.tiles[0];
+                let tileValue = board[constraint.tiles[0]];
                 for(let tile of constraint.tiles){
                     if(board[tile] !== tileValue){
                         return false;
